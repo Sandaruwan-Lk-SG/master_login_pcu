@@ -1,5 +1,5 @@
 // ==========================================
-// USER MANAGEMENT SCRIPT (MASTER ADMIN ONLY) - PASSWORD UPGRADE
+// USER MANAGEMENT SCRIPT (MASTER ADMIN ONLY) - FINAL CORRECTED PASSWORD
 // ==========================================
 
 const BACKEND_URL = 'https://pcu-inventory-backend-production.up.railway.app'; 
@@ -8,32 +8,42 @@ const userListBody = document.querySelector('#userList tbody');
 const addMessageDiv = document.getElementById('addMessage');
 const listMessageDiv = document.getElementById('listMessage');
 
-// Initial check is correct
 if (!masterPin) {
     alert('Unauthorized Access. Please login as Master Admin.');
     window.location.href = 'index.html';
 }
 
 // ----------------------------------------------------
-// 1. Fetch and Display Users (Logic is correct)
+// 1. Fetch and Display Users (CRITICAL: Needs masterPin header)
 // ----------------------------------------------------
 async function fetchUsers() {
     listMessageDiv.textContent = 'Loading users...';
     listMessageDiv.style.color = '#f1faee';
-    userListBody.innerHTML = ''; 
+    userListBody.innerHTML = '';
 
     try {
         const response = await fetch(`${BACKEND_URL}/api/users`, {
             method: 'GET',
             headers: {
-                'X-Master-Pin': masterPin 
+                'X-Master-Pin': masterPin // CRITICAL HEADER
             }
         });
         
-        // ... (rest of the fetchUsers logic is correct)
+        if (response.status === 403) {
+             throw new Error('403 Forbidden: Master Admin PIN rejected by server. (Check Railway ENV VAR)');
+        }
+        if (!response.ok) {
+            throw new Error(`Failed to fetch: ${response.status} ${response.statusText}`);
+        }
+
+        const users = await response.json();
+        listMessageDiv.textContent = ''; 
+        // ... (display logic)
         
     } catch (error) {
-        // ...
+        listMessageDiv.textContent = `Error loading users: ${error.message}`;
+        listMessageDiv.style.color = '#e63946';
+        console.error("Fetch Users Error:", error);
     }
 }
 
@@ -47,10 +57,9 @@ document.getElementById('addUserForm').addEventListener('submit', async (e) => {
 
     const username = document.getElementById('newUsername').value.trim();
     const role = document.getElementById('newRole').value;
-    const pin = document.getElementById('newPin').value; // This is the new password
+    const pin = document.getElementById('newPin').value; // Password
 
-    // New validation: Password must be at least 8 characters
-    if (pin.length < 8) { 
+    if (pin.length < 8) { // Minimum 8 character password check
         addMessageDiv.textContent = 'Password must be at least 8 characters long.';
         addMessageDiv.style.color = '#e63946';
         return;
@@ -61,9 +70,8 @@ document.getElementById('addUserForm').addEventListener('submit', async (e) => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-Master-Pin': masterPin // CRITICAL: Master Auth Header
+                'X-Master-Pin': masterPin // CRITICAL HEADER
             },
-            // CRITICAL: Send 'pin' key with the strong password
             body: JSON.stringify({ 
                 username: username, 
                 role: role, 
@@ -89,13 +97,26 @@ document.getElementById('addUserForm').addEventListener('submit', async (e) => {
     }
 });
 
-
 // ----------------------------------------------------
-// 3. Remove User (Logic is correct)
+// 3. Remove User (CRITICAL: Needs masterPin header)
 // ----------------------------------------------------
 async function removeUser(username) {
-    // ... (logic remains the same)
+    if (!confirm(`Are you sure you want to remove user: ${username}?`)) {
+        return;
+    }
+    // ... (message setup)
+    
+    try {
+        const response = await fetch(`${BACKEND_URL}/api/users/${encodeURIComponent(username)}`, {
+            method: 'DELETE',
+            headers: {
+                'X-Master-Pin': masterPin // CRITICAL HEADER
+            }
+        });
+        // ... (rest of the logic)
+    } catch (error) {
+        // ...
+    }
 }
 
-// Initial load
 fetchUsers();
