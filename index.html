@@ -5,9 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PCU Inventory Login</title>
     <style>
-        /* ... (CSS remains the same) */
-        /* input[type="password"] styles */
-        input[type="password"] {
+        /* Basic Glassmorphism CSS - (CSS සම්පූර්ණයෙන් නැවත ඇතුළත් කර ඇත) */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #a8dadc, #457b9d);
+            margin: 0; /* Add margin 0 to ensure full page coverage */
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 40px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            color: #f1faee;
+        }
+        h2 {
+            margin-bottom: 30px;
+            color: #f1faee;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+        /* Input fields are targeted correctly */
+        input[type="password"] { 
             width: 100%;
             padding: 12px 20px;
             margin: 8px 0;
@@ -19,7 +46,26 @@
             font-size: 18px;
             text-align: center;
         }
-        /* ... (rest of the CSS) */
+        button {
+            background-color: #e63946;
+            color: white;
+            padding: 14px 20px;
+            margin: 20px 0 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #c9343f;
+        }
+        #message {
+            margin-top: 15px;
+            color: #e63946;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
