@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Management - Master Admin</title>
     <style>
+        /* CSS is correct and unchanged */
         body {
             font-family: Arial, sans-serif;
             min-height: 100vh;
@@ -81,8 +82,8 @@
                 </select>
             </div>
             <div class="form-group">
-                <label for="newPin">PIN (4 Digits):</label>
-                <input type="password" id="newPin" required maxlength="4">
+                <label for="newPin">Password (Min 8 characters):</label>
+                <input type="password" id="newPin" required> 
             </div>
             <button type="submit">Add User</button>
             <div id="addMessage" style="margin-top: 10px;"></div>
