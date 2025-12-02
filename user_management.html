@@ -4,44 +4,248 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Master Admin - User Management</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+    <style>
+        /* --- Glassmorphism Effect & Background Setup --- */
+        body {
+            /* VIBRANT BACKGROUND is essential for Glassmorphism */
+            background: linear-gradient(135deg, #a8dadc, #457b9d); 
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px 0;
+            color: #1d3557; /* Dark text color */
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.2); /* Semi-transparent background */
+            backdrop-filter: blur(10px); /* The "Glass" effect */
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.4); /* Light border */
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37); /* Subtle shadow */
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        /* Adjustments for inputs/selects inside glass cards */
+        .form-control, .form-select {
+            background-color: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: #1d3557;
+        }
+        .form-control:focus, .form-select:focus {
+            background-color: white; 
+            box-shadow: 0 0 0 0.25rem rgba(69, 123, 157, 0.25);
+            border-color: #457b9d;
+        }
+        
+        /* Table Styling */
+        #userList {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 10px; /* Space between rows */
+        }
+        #userList thead th {
+            background-color: rgba(29, 53, 87, 0.8); /* Dark header background */
+            color: white;
+            border: none;
+        }
+        #userList tbody tr {
+            background-color: rgba(255, 255, 255, 0.7); /* Semi-transparent rows */
+            transition: background-color 0.3s;
+        }
+        #userList tbody tr:hover {
+             background-color: rgba(255, 255, 255, 0.9); /* Opaque on hover */
+        }
+
+        /* Remove Button */
+        .btn-danger {
+            background-color: #e63946;
+            border-color: #e63946;
+        }
+        .btn-danger:hover {
+            background-color: #d62f3f;
+            border-color: #d62f3f;
+        }
+    </style>
 </head>
 <body>
-    <h1>Master Admin Panel</h1>
-    <h2>User Management</h2>
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                
+                <h1 class="text-center mb-1" style="color: #1d3557;">Master Admin Panel</h1>
+                <h2 class="text-center mb-4">User Management</h2>
 
-    <div id="addUserSection">
-        <h3>Add New User</h3>
-        <form id="addUserForm">
-            <input type="text" id="newUsername" placeholder="Username" required><br>
-            <input type="password" id="newPin" placeholder="Pin" required><br> 
-            <select id="newRole" required>
-                <option value="user">User</option>
-                <option value="admin">Admin</option>
-            </select><br><br>
-            <button type="submit">Create User</button>
-        </form>
-        <p id="addMessage" style="margin-top: 10px;"></p>
+                <div id="addUserSection" class="glass-card">
+                    <h3 class="mb-4">Add New User</h3>
+                    
+                    <form id="addUserForm">
+                        <div class="mb-3">
+                            <input type="text" id="newUsername" placeholder="Username" required class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <input type="password" id="newPin" placeholder="Pin" required class="form-control">
+                        </div>
+                        <div class="mb-4">
+                            <select id="newRole" required class="form-select">
+                                <option value="user">User</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Create User</button>
+                    </form>
+                    <p id="addMessage" class="mt-3"></p>
+                </div>
+
+                <div id="listUserSection" class="glass-card">
+                    <h3 class="mb-4">Existing Users</h3>
+                    <p id="listMessage" class="mb-3"></p>
+                    
+                    <div class="table-responsive">
+                        <table id="userList" class="table table-sm table-borderless">
+                            <thead>
+                                <tr>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Username</th>
+                                    <th scope="col">Role</th>
+                                    <th scope="col">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <hr>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    
+    <script>
+        const BACKEND_URL = 'https://pcu-inventory-backend-production.up.railway.app'; 
+        const masterPin = localStorage.getItem('masterPin');
+        const userListBody = document.querySelector('#userList tbody');
+        const addMessageDiv = document.getElementById('addMessage');
+        const listMessageDiv = document.getElementById('listMessage');
 
-    <div id="listUserSection">
-        <h3>Existing Users</h3>
-        <p id="listMessage" style="margin-bottom: 10px;"></p>
-        <table id="userList" border="1">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Username</th>
-                    <th>Role</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                </tbody>
-        </table>
-    </div>
+        // --- Initialization ---
+        if (!masterPin) {
+            alert('Unauthorized Access. Please login as Master Admin.');
+            window.location.href = 'index.html'; 
+        }
 
-    <script src="script.js"></script>
+        // 1. Fetch and Display Users (GET /api/users)
+        async function fetchUsers() {
+            listMessageDiv.textContent = 'Loading users...';
+            userListBody.innerHTML = '';
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/users`, {
+                    method: 'GET',
+                    headers: { 'X-Master-Pin': masterPin }
+                });
+                
+                if (response.status === 403) {
+                     listMessageDiv.textContent = 'AUTHORIZATION FAILED: Master Admin PIN rejected. Session expired?';
+                     return;
+                }
+                if (!response.ok) { throw new Error(`Failed to fetch: ${response.statusText}`); }
+
+                const users = await response.json();
+                listMessageDiv.textContent = users.length === 0 ? 'No users found.' : '';
+
+                users.forEach(user => {
+                    const row = userListBody.insertRow();
+                    row.insertCell(0).textContent = user.id; 
+                    row.insertCell(1).textContent = user.username;
+                    row.insertCell(2).textContent = user.role.toUpperCase();
+
+                    const actionCell = row.insertCell(3);
+                    const removeButton = document.createElement('button');
+                    removeButton.textContent = 'Remove';
+                    removeButton.className = 'btn btn-sm btn-danger'; // Added Bootstrap class
+                    removeButton.onclick = () => removeUser(user.username); 
+                    actionCell.appendChild(removeButton);
+                });
+                
+            } catch (error) {
+                listMessageDiv.textContent = `Error loading users: ${error.message}. Check backend status.`;
+            }
+        }
+
+        // 2. Add New User (POST /api/users)
+        document.getElementById('addUserForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            addMessageDiv.textContent = 'Adding user...';
+            const username = document.getElementById('newUsername').value.trim();
+            const role = document.getElementById('newRole').value;
+            const pin = document.getElementById('newPin').value;
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/users`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-Master-Pin': masterPin },
+                    body: JSON.stringify({ username, role, pin }) 
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    addMessageDiv.textContent = `User ${username} created successfully!`;
+                    addMessageDiv.className = 'text-success';
+                    document.getElementById('addUserForm').reset();
+                    fetchUsers();
+                } else if (response.status === 409) {
+                     addMessageDiv.textContent = `Error: Username '${username}' already exists.`;
+                     addMessageDiv.className = 'text-danger';
+                } else {
+                     const errorMessage = data.error || data.message || response.statusText;
+                     addMessageDiv.textContent = `Failed to add user: ${errorMessage}`;
+                     addMessageDiv.className = 'text-danger';
+                }
+            } catch (error) {
+                addMessageDiv.textContent = 'Network Error! Failed to connect to backend.';
+                addMessageDiv.className = 'text-danger';
+            }
+        });
+
+
+        // 3. Remove Existing User (DELETE /api/users/:username)
+        async function removeUser(username) {
+            if (!confirm(`Are you sure you want to remove the user: ${username}?`)) { return; }
+            listMessageDiv.textContent = `Attempting to remove user ${username}...`;
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/users/${username}`, {
+                    method: 'DELETE', 
+                    headers: { 'X-Master-Pin': masterPin }
+                });
+
+                if (response.ok || response.status === 204) {
+                    listMessageDiv.textContent = `User ${username} successfully removed.`;
+                    listMessageDiv.className = 'text-success';
+                    fetchUsers();
+                } else if (response.status === 404) {
+                    listMessageDiv.textContent = `User ${username} not found.`;
+                    listMessageDiv.className = 'text-warning';
+                } else {
+                    listMessageDiv.textContent = `Deletion failed: ${response.statusText}`;
+                    listMessageDiv.className = 'text-danger';
+                }
+            } catch (error) {
+                listMessageDiv.textContent = 'Network or Server Error during deletion.';
+                listMessageDiv.className = 'text-danger';
+            }
+        }
+
+        // Initial Execution
+        fetchUsers();
+    </script>
 </body>
 </html>
