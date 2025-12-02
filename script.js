@@ -1,5 +1,5 @@
 // ==========================================
-// USER MANAGEMENT FRONTEND SCRIPT (script.js) - FINAL FIX
+// USER MANAGEMENT FRONTEND SCRIPT (script.js) - FINAL FIX ('pin' -> 'password')
 // ==========================================
 
 const BACKEND_URL = 'https://pcu-inventory-backend-production.up.railway.app'; 
@@ -43,6 +43,7 @@ async function fetchUsers() {
             const actionCell = row.insertCell(3);
             const removeButton = document.createElement('button');
             removeButton.textContent = 'Remove';
+            removeButton.className = 'btn btn-sm btn-danger';
             removeButton.onclick = () => removeUser(user.username); 
             actionCell.appendChild(removeButton);
         });
@@ -58,29 +59,33 @@ document.getElementById('addUserForm').addEventListener('submit', async (e) => {
     addMessageDiv.textContent = 'Adding user...';
     const username = document.getElementById('newUsername').value.trim();
     const role = document.getElementById('newRole').value;
-    const pin = document.getElementById('newPin').value;
+    const password = document.getElementById('newPassword').value; // ✅ CHANGED: Reads 'newPassword'
 
     try {
         const response = await fetch(`${BACKEND_URL}/api/users`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-Master-Pin': masterPin },
-            body: JSON.stringify({ username, role, pin }) 
+            body: JSON.stringify({ username, role, password }) // ✅ CHANGED: Sends 'password'
         });
 
         const data = await response.json();
         
         if (response.ok) {
             addMessageDiv.textContent = `User ${username} created successfully!`;
+            addMessageDiv.className = 'text-success';
             document.getElementById('addUserForm').reset();
             fetchUsers();
         } else if (response.status === 409) {
              addMessageDiv.textContent = `Error: Username '${username}' already exists.`;
+             addMessageDiv.className = 'text-danger';
         } else {
              const errorMessage = data.error || data.message || response.statusText;
              addMessageDiv.textContent = `Failed to add user: ${errorMessage}`;
+             addMessageDiv.className = 'text-danger';
         }
     } catch (error) {
         addMessageDiv.textContent = 'Network Error! Failed to connect to backend.';
+        addMessageDiv.className = 'text-danger';
     }
 });
 
@@ -98,14 +103,18 @@ async function removeUser(username) {
 
         if (response.ok || response.status === 204) {
             listMessageDiv.textContent = `User ${username} successfully removed.`;
+            listMessageDiv.className = 'text-success';
             fetchUsers();
         } else if (response.status === 404) {
             listMessageDiv.textContent = `User ${username} not found.`;
+            listMessageDiv.className = 'text-warning';
         } else {
             listMessageDiv.textContent = `Deletion failed: ${response.statusText}`;
+            listMessageDiv.className = 'text-danger';
         }
     } catch (error) {
         listMessageDiv.textContent = 'Network or Server Error during deletion.';
+        listMessageDiv.className = 'text-danger';
     }
 }
 
